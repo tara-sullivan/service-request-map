@@ -4,16 +4,6 @@ __generated_with = "0.20.1"
 app = marimo.App(width="medium")
 
 @app.cell
-async def _():
-    import micropip
-    await micropip.install("folium")
-
-@app.cell
-async def _():
-    import micropip
-    await micropip.install("geopandas")
-
-@app.cell
 def _(mo):
     mo.md(f"""
     # 311 Heat and Hot Water service requests
