@@ -21,7 +21,7 @@ jobs:
         run: uv run python -m pip list
 
       - name: Export notebook
-        run: uv run marimo export html notebooks/sr_heat.py -o docs/index.html
+        run: uv run marimo export html notebooks/sr_heat.py -o docs/index.html --mode run --force
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
