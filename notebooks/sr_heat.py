@@ -1,7 +1,5 @@
 import marimo
 
-
-__requires__ = ['folium', 'geopandas', 'branca']
 __generated_with = "0.20.1"
 app = marimo.App(width="medium")
 
@@ -20,6 +18,9 @@ def _(mo):
 def _():
     import pandas as pd
     import marimo as mo
+
+    import micropip
+    await micropip.install(["folium", "geopandas", "branca"])
 
     import geopandas as gpd
     import folium
