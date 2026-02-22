@@ -14,7 +14,7 @@ jobs:
 
             - name: Export notebook
               run: |
-                  uv run marimo export html-wasm notebooks/sr_heat.py -o docs/index.html --mode run
+                  uv run marimo export html notebooks/sr_heat.py -o docs/index.html --mode run
 
             - name: Upload Pages Artifact
               uses: actions/upload-pages-artifact@v3
