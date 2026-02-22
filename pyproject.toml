@@ -1,0 +1,22 @@
+[project]
+name = "service-request-map"
+version = "0.1.0"
+description = "Map service requests"
+readme = "README.md"
+authors = [
+    { name = "Tara Sullivan", email = "tsullivan126@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+service-request-map = "service_request_map:main"
+
+[build-system]
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.2.0",
+]
