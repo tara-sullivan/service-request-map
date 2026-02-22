@@ -1,5 +1,7 @@
 import marimo
 
+__requires__ = ["folium", "pandas", "geopandas" "sodapy"]  # add all your deps here
+
 __generated_with = "0.20.1"
 app = marimo.App(width="medium")
 
