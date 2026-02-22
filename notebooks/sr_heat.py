@@ -1,7 +1,5 @@
 import marimo
 
-__requires__ = ["folium", "pandas", "geopandas" "sodapy"]  # add all your deps here
-
 __generated_with = "0.20.1"
 app = marimo.App(width="medium")
 
@@ -20,6 +18,9 @@ def _(mo):
 def _():
     import pandas as pd
     import marimo as mo
+
+    import micropip
+    await micropip.install("folium")
 
     import geopandas as gpd
     import folium
