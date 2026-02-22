@@ -4,9 +4,14 @@ __generated_with = "0.20.1"
 app = marimo.App(width="medium")
 
 @app.cell
-def _():
+async def _():
     import micropip
-    await micropip.install(["folium", "geopandas", "branca"])
+    await micropip.install("folium")
+
+@app.cell
+async def _():
+    import micropip
+    await micropip.install("geopandas")
 
 @app.cell
 def _(mo):
