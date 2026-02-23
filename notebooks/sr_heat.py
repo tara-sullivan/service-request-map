@@ -3,12 +3,12 @@ import marimo
 __generated_with = "0.20.1"
 app = marimo.App(width="medium")
 
+
 @app.cell
 def _(mo):
     mo.md(f"""
     # 311 Heat and Hot Water service requests
     ## January 2026 snow storm
-    Note that app actively queries Open Data when opened, and will take a minute to load.
     """)
     return
 
@@ -44,36 +44,40 @@ def _(get_zip_geojson):
 def _(mo, sr_df):
     complaint_dropdown = mo.ui.dropdown(
         list(sr_df['complaint_type'].unique()),
-        label='Complaint Type:'
+        label='Complaint Type:',
+        value=None,
     )
     start_date = mo.ui.date(
         start=sr_df['created_date_dt'].min(),
         stop=sr_df['created_date_dt'].max(),
         label='Start Date:',
+        value=None,
     )
     end_date = mo.ui.date(
         start=sr_df['created_date_dt'].min(),
         stop=sr_df['created_date_dt'].max(),
         label='End Date:',
+        value=None,
     )
 
-    mo.hstack([complaint_dropdown, start_date, end_date])
-    return complaint_dropdown, end_date, start_date
+    # mo.hstack([complaint_dropdown, start_date, end_date])
+    _cards = [
+        mo.stat(label='Total service requests', value=len(sr_df), bordered=True),
+        mo.stat(label='Start date', value=sr_df['created_date_dt'].min(), bordered=True),
+        mo.stat(label='End date', value=sr_df['created_date_dt'].max(), bordered=True)
+    ]
+
+    mo.hstack(_cards, widths='equal', align='center')
+    return
 
 
 @app.cell
-def _(complaint_dropdown, end_date, pd, sr_df, start_date):
+def _(pd, sr_df):
     group_by_filter = pd.Series(index=sr_df.index, data=True)
 
-    if complaint_dropdown.value is not None:
-        complaint_filter = (sr_df['complaint_type'] == complaint_dropdown.value)
-    else:
-        complaint_filter= pd.Series(index=sr_df.index, data=True)
+    complaint_filter= pd.Series(index=sr_df.index, data=True)
 
-    date_filter = (
-            (sr_df['created_date_dt'] >= start_date.value) &
-            (sr_df['created_date_dt'] < (end_date.value + pd.Timedelta(1, 'D')))
-    )
+    date_filter = pd.Series(index=sr_df.index, data=True)
 
     filter_df = sr_df.loc[(group_by_filter & complaint_filter & date_filter), ['unique_key', 'incident_zip']]
 
@@ -82,7 +86,6 @@ def _(complaint_dropdown, end_date, pd, sr_df, start_date):
         .reset_index()
         .rename(columns={'unique_key': 'count', 'incident_zip': 'zip'})
     )
-    print(group_by_df.head())
     return (group_by_df,)
 
 
@@ -130,6 +133,11 @@ def _(cm, folium, zip_count_gdf):
     colormap.add_to(map)
 
     map
+    return
+
+
+@app.cell
+def _():
     return
 
 
