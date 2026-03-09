@@ -22,22 +22,16 @@ def _():
     import folium
     import branca.colormap as cm
 
-    from service_request_map.extract.get_sr_socrata import get_sr_socrata
-    from service_request_map.extract.get_zip_geojson import get_zip_geojson
-
-    return cm, folium, get_sr_socrata, get_zip_geojson, mo, pd
-
-
-@app.cell
-def _(get_sr_socrata):
-    sr_df = get_sr_socrata(complaint_type='heat')
-    return (sr_df,)
+    # from service_request_map.extract.get_sr_socrata import get_sr_socrata
+    # from service_request_map.extract.get_zip_geojson import get_zip_geojson
+    return cm, folium, gpd, mo, pd
 
 
 @app.cell
-def _(get_zip_geojson):
-    zip_gdf = get_zip_geojson()
-    return (zip_gdf,)
+def _(gpd, pd):
+    sr_df = pd.read_parquet('data/sr_data.parquet')
+    zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
+    return sr_df, zip_gdf
 
 
 @app.cell

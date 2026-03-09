@@ -1,0 +1,38 @@
+name: Fetch data
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write        # needed to commit the parquet back
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin libgdal-dev libgeos-dev
+
+      - name: Install dependencies
+        run: uv sync --locked --all-extras --dev
+
+      - name: Fetch data
+        run: uv run service-request-map
+
+      - name: Commit parquet files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "chore: refresh data [skip ci]"
+          git push
