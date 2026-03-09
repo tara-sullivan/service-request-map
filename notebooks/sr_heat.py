@@ -65,13 +65,13 @@ def _(mo, sr_df):
     )
 
     mo.hstack([complaint_dropdown, start_date, end_date])
-    _cards = [
-        mo.stat(label='Total service requests', value=len(sr_df), bordered=True),
-        mo.stat(label='Start date', value=sr_df['created_date_dt'].min(), bordered=True),
-        mo.stat(label='End date', value=sr_df['created_date_dt'].max(), bordered=True)
-    ]
+    # _cards = [
+    #     mo.stat(label='Total service requests', value=len(sr_df), bordered=True),
+    #     mo.stat(label='Start date', value=sr_df['created_date_dt'].min(), bordered=True),
+    #     mo.stat(label='End date', value=sr_df['created_date_dt'].max(), bordered=True)
+    # ]
 
-    mo.hstack(_cards, widths='equal', align='center')
+    # mo.hstack(_cards, widths='equal', align='center')
     return complaint_dropdown, end_date, start_date
 
 
