@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.1"
+__generated_with = "0.20.4"
 app = marimo.App(width="medium")
 
 
@@ -61,22 +61,15 @@ def _(mo, sr_df):
         start=sr_df['created_date_dt'].min(),
         stop=sr_df['created_date_dt'].max(),
         label='End Date:',
-        value=None,
+        value=sr_df['created_date_dt'].max(),
     )
 
     mo.hstack([complaint_dropdown, start_date, end_date])
-    # _cards = [
-    #     mo.stat(label='Total service requests', value=len(sr_df), bordered=True),
-    #     mo.stat(label='Start date', value=sr_df['created_date_dt'].min(), bordered=True),
-    #     mo.stat(label='End date', value=sr_df['created_date_dt'].max(), bordered=True)
-    # ]
-
-    # mo.hstack(_cards, widths='equal', align='center')
     return complaint_dropdown, end_date, start_date
 
 
 @app.cell
-def _(complaint_dropdown, end_date, pd, sr_df, start_date):
+def _(complaint_dropdown, end_date, mo, pd, sr_df, start_date):
     group_by_filter = pd.Series(index=sr_df.index, data=True)
 
     # complaint_filter= pd.Series(index=sr_df.index, data=True)
@@ -100,6 +93,14 @@ def _(complaint_dropdown, end_date, pd, sr_df, start_date):
         .reset_index()
         .rename(columns={'unique_key': 'count', 'incident_zip': 'zip'})
     )
+
+    _cards = [
+        mo.stat(label='Total service requests', value=len(filter_df), bordered=True),
+        mo.stat(label='Start date', value=start_date.value, bordered=True),
+        mo.stat(label='End date', value=end_date.value, bordered=True)
+    ]
+
+    mo.hstack(_cards, widths='equal', align='center')
     return (group_by_df,)
 
 

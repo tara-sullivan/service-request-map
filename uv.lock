@@ -951,7 +951,7 @@ wheels = [
 
 [[package]]
 name = "marimo"
-version = "0.20.1"
+version = "0.20.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -972,9 +972,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/da/b2/c2d660dc31c26896f27412e5526892ff3e1112e33cd5d8cc4c265ad9c1af/marimo-0.20.1.tar.gz", hash = "sha256:7c1131057c62b75612939cbcc3fe6c97ce17a56204296369ca9a8ab85824c20e", size = 38236270, upload-time = "2026-02-20T18:43:29.345Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/eb/3c19ce54be3440cece96bffbb2027c57d618ab336d53ef6a962f570ce468/marimo-0.20.4.tar.gz", hash = "sha256:7f46ce837953717504673e33e47fb42a619bf5f9d2000d1a3a3b1663a47c5498", size = 38336283, upload-time = "2026-03-04T01:15:13.641Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8c/b2/350bcd7cfe76a90c1482060321d8ee36d40f3d3d241656e6a54e4723e284/marimo-0.20.1-py3-none-any.whl", hash = "sha256:4d949f3f3151399e563ef1a543cbeed2ab880f4de88119be29e6c2f094525012", size = 38644606, upload-time = "2026-02-20T18:43:37.904Z" },
+    { url = "https://files.pythonhosted.org/packages/56/62/bf2c92cc7aab69edfb3907e9bf102c37c1e16b8f4bc6ddd4258ae4c8063c/marimo-0.20.4-py3-none-any.whl", hash = "sha256:3200edd7209f470821b58deb4a45e0577889fab1052748d77088f18bef7d9dd8", size = 38752562, upload-time = "2026-03-04T01:15:09.608Z" },
 ]
 
 [[package]]
@@ -2070,7 +2070,7 @@ requires-dist = [
     { name = "fastparquet", specifier = ">=2025.12.0" },
     { name = "folium", specifier = ">=0.20.0" },
     { name = "geopandas", specifier = ">=1.1.2" },
-    { name = "marimo", specifier = ">=0.20.1" },
+    { name = "marimo", specifier = ">=0.20.2" },
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "numpy", specifier = ">=2.4.2" },
     { name = "openpyxl", specifier = ">=3.1.5" },
