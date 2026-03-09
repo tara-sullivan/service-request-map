@@ -28,6 +28,16 @@ def _():
 
 
 @app.cell
+def _(mo):
+    import datetime
+
+    mo.md(f"""
+    Last updated: {datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')}
+    """)
+    return
+
+
+@app.cell
 def _(gpd, pd):
     sr_df = pd.read_parquet('data/sr_data.parquet')
     zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
@@ -54,7 +64,7 @@ def _(mo, sr_df):
         value=None,
     )
 
-    # mo.hstack([complaint_dropdown, start_date, end_date])
+    mo.hstack([complaint_dropdown, start_date, end_date])
     _cards = [
         mo.stat(label='Total service requests', value=len(sr_df), bordered=True),
         mo.stat(label='Start date', value=sr_df['created_date_dt'].min(), bordered=True),
@@ -62,16 +72,26 @@ def _(mo, sr_df):
     ]
 
     mo.hstack(_cards, widths='equal', align='center')
-    return
+    return complaint_dropdown, end_date, start_date
 
 
 @app.cell
-def _(pd, sr_df):
+def _(complaint_dropdown, end_date, pd, sr_df, start_date):
     group_by_filter = pd.Series(index=sr_df.index, data=True)
 
-    complaint_filter= pd.Series(index=sr_df.index, data=True)
+    # complaint_filter= pd.Series(index=sr_df.index, data=True)
 
-    date_filter = pd.Series(index=sr_df.index, data=True)
+    # date_filter = pd.Series(index=sr_df.index, data=True)
+
+    if complaint_dropdown.value is not None:
+        complaint_filter = (sr_df['complaint_type'] == complaint_dropdown.value)
+    else:
+        complaint_filter= pd.Series(index=sr_df.index, data=True)
+
+    date_filter = (
+            (sr_df['created_date_dt'] >= start_date.value) &
+            (sr_df['created_date_dt'] < (end_date.value + pd.Timedelta(1, 'D')))
+    )
 
     filter_df = sr_df.loc[(group_by_filter & complaint_filter & date_filter), ['unique_key', 'incident_zip']]
 
