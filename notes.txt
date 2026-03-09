@@ -1,0 +1,54 @@
+## Summary notes
+
+**Problem:** Marimo sandboxes `mo.Html()` in a restricted iframe that blocks external scripts and `fetch()` requests. This meant Leaflet.js (and any other external JS library) couldn't load, producing a blank cell.
+
+**Solution:** Use `mo.iframe()` instead of `mo.Html()`. It uses a less restrictive iframe that allows external scripts to load. The content must be a full HTML document (with `<html>`, `<head>`, `<body>` tags) rather than an HTML fragment.
+
+**Why Leaflet instead of Folium:** Folium is a Python wrapper around Leaflet.js. In a WASM context (and for this iframe approach), Python packages like Folium aren't available — only JavaScript runs in the browser. So we cut out the middleman and write Leaflet.js directly.
+
+---
+
+**Translation key for an LLM:** If you hand this to an LLM and say "convert my Folium map to work in marimo", the prompt additions to include are:
+
+- *"Use `mo.iframe()` with a full HTML document, not `mo.Html()`"*
+- *"Replace Folium with Leaflet.js loaded from a CDN"*
+- *"The GeoJSON data should be serialized with `.to_json()` and injected as a Python f-string into the JavaScript"*
+- *"Escape all curly braces in the JS with double braces `{{}}` since it's inside an f-string"*
+
+
+Where i stopped: trying to explore  marimo wasm option. Might not work. Right now I try running using `html-wasm`:
+```bash
+uv run marimo export html-wasm notebooks/sr_heat.py -o docs/ --mode run
+```
+Then;
+```bash
+cd docs
+python -m http.server
+```
+Then open `http://localhost:8000` in your browser. See where the code is breaking. 
+
+## Summary of today's progress
+
+### What you built
+- A nightly GitHub Actions workflow (`fetch_data.yml`) that pulls data from Socrata and commits parquet files to your repo
+- A marimo notebook that reads from those parquet files instead of hitting Socrata live
+- A working Leaflet.js map rendered via `mo.iframe()` replacing Folium
+
+### What we learned
+- `mo.Html()` blocks external scripts — `mo.iframe()` with a full HTML document is the fix
+- Folium/branca don't work in WASM — Leaflet.js via CDN is the replacement
+- The WASM export command is `marimo export html-wasm`, not `marimo export html --mode wasm`
+- Data paths should use `mo.notebook_location()` for portability
+
+---
+
+## Where to start tomorrow
+
+You have one remaining error before the WASM export will work:
+
+**`pyarrow` is not available in Pyodide.** You need to convert your data files from parquet to a format that WASM can read. The two options are:
+
+1. **CSV** — simplest, but loses geometry for `zip_gdf`
+2. **GeoJSON** — works for both, no extra dependencies needed in Pyodide
+
+First thing tomorrow, change `fetch_data.py` to write GeoJSON/CSV instead of parquet, then update the notebook to read those formats. That should unblock the WASM export.
