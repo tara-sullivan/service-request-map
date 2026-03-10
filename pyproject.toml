@@ -14,6 +14,7 @@ dependencies = [
     "marimo>=0.20.2",
     "matplotlib>=3.10.8",
     "numpy>=2.4.2",
+    "openlayers>=0.1.6",
     "openpyxl>=3.1.5",
     "pandas>=3.0.1",
     "pyarrow>=23.0.1",

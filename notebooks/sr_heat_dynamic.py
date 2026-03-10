@@ -19,8 +19,11 @@ def _():
     import marimo as mo
     import geopandas as gpd
     import pathlib
+    import openlayers as ol
+    import json
+    import requests
 
-    return gpd, mo, pathlib, pd
+    return gpd, mo, ol, pd
 
 
 @app.cell
@@ -34,10 +37,19 @@ def _(mo):
 
 
 @app.cell
-def _(gpd, mo, pathlib, pd):
-    _base = pathlib.Path(mo.notebook_location()).parents[0]
-    sr_df = pd.read_parquet(_base / 'data' / 'sr_data.parquet')
-    zip_gdf = gpd.read_parquet(_base / 'data' / 'zip_geo.parquet')
+def _(gpd, pd):
+    # _base = pathlib.Path(mo.notebook_location()).parents[0]
+    # sr_df = pd.read_parquet(_base / 'data' / 'sr_data.parquet')
+    # zip_gdf = gpd.read_parquet(_base / 'data' / 'zip_geo.parquet')
+    # sr_df = pd.read_parquet('data/sr_data.parquet')
+    zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
+
+    parquet_file = r'https://raw.githubusercontent.com/tara-sullivan/service-request-map/main/data/sr_data.parquet'
+    sr_df = pd.read_parquet(parquet_file, engine='auto')
+
+    # parquet_file = r'https://raw.githubusercontent.com/tara-sullivan/service-request-map/main/data/zip_geo.parquet'
+    # reponse = requests.get(parquet_file)
+    # # zip_gdf = gpd.read_parquet(io.BytesIO(resp.content))
     return sr_df, zip_gdf
 
 
@@ -110,74 +122,41 @@ def _(group_by_df, pd, zip_gdf):
 
 
 @app.cell
-def _(mo, zip_count_gdf):
-    import json
+def _(ol, zip_count_gdf):
+    map = ol.MapWidget(ol.View(center=(-73.94, 40.70), zoom=10))
 
-    _geojson_str = zip_count_gdf[['zip', 'count', 'geometry']].to_json()
+    min_count = int(zip_count_gdf['count'].min())
+    max_count = int(zip_count_gdf['count'].max())
 
-    mo.iframe(f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-      <style> body {{ margin: 0; }} #map {{ height: 600px; width: 100%; }} </style>
-    </head>
-    <body>
-    <div id="map"></div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-      var map = L.map('map').setView([40.70, -73.94], 10);
-      L.tileLayer('https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-      }}).addTo(map);
+    zip_style = ol.FlatStyle(
+        fill_color=[
+            "interpolate", ["linear"],
+            ["get", "count"],
+            min_count, "rgba(255, 245, 235, 0.8)",   # low  → light orange
+            max_count, "rgba(179, 0, 0, 0.8)",        # high → dark red
+        ],
+        stroke_color="#555555",
+        stroke_width=1.0,
+    )
 
-      var data = {_geojson_str};
-      var counts = data.features.map(f => f.properties.count);
-      var maxCount = Math.max(...counts);
+    # zip_style = ol.FlatStyle(
+    #     fill_color="rgba(100, 149, 237, 0.3)",  # semi-transparent blue fill
+    #     stroke_color="#3355aa",
+    #     stroke_width=1.5,
+    # )
+    zip_vector = ol.VectorSource(geojson=ol.gdf_to_geojson(zip_count_gdf))
 
-      function getColor(val) {{
-        if (maxCount === 0) return '#ffffcc';
-        var t = val / maxCount;
-        var stops = [
-          [255, 255, 204],
-          [254, 217, 118],
-          [253, 141,  60],
-          [227,  26,  28],
-          [128,   0,  38],
-        ];
-        var i = Math.min(Math.floor(t * (stops.length - 1)), stops.length - 2);
-        var f = t * (stops.length - 1) - i;
-        var r = Math.round(stops[i][0] + f * (stops[i+1][0] - stops[i][0]));
-        var g = Math.round(stops[i][1] + f * (stops[i+1][1] - stops[i][1]));
-        var b = Math.round(stops[i][2] + f * (stops[i+1][2] - stops[i][2]));
-        return 'rgb(' + r + ',' + g + ',' + b + ')';
-      }}
+    zip_layer = ol.VectorLayer(
+        source=zip_vector,
+        style=zip_style,
+    )
 
-      L.geoJSON(data, {{
-        style: function(feature) {{
-          return {{
-            fillColor: getColor(feature.properties.count),
-            color: 'black',
-            weight: 0.5,
-            fillOpacity: 0.7
-          }};
-        }},
-        onEachFeature: function(feature, layer) {{
-          layer.bindTooltip(
-            '<b>ZIP:</b> ' + feature.properties.zip +
-            '<br><b>Count:</b> ' + feature.properties.count
-          );
-        }}
-      }}).addTo(map);
-    </script>
-    </body>
-    </html>
-    """, height=620)
-    return
+    map.add_layer(zip_layer)
 
+    # adds count and zip for hover
+    map.add_tooltip()
 
-@app.cell
-def _():
+    map
     return
 
 
