@@ -37,9 +37,11 @@ def _(mo):
 
 @app.cell
 def _(gpd, mo, pathlib, pd):
-    _base = pathlib.Path(mo.notebook_location()).parents[0]
-    sr_df = pd.read_parquet(_base / 'data' / 'sr_data.parquet')
-    zip_gdf = gpd.read_parquet(_base / 'data' / 'zip_geo.parquet')
+    # _base = pathlib.Path(mo.notebook_location()).parents[0]
+    # sr_df = pd.read_parquet(_base / 'data' / 'sr_data.parquet')
+    # zip_gdf = gpd.read_parquet(_base / 'data' / 'zip_geo.parquet')
+    sr_df = pd.read_parquet('data/sr_data.parquet')
+    zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
     return sr_df, zip_gdf
 
 
