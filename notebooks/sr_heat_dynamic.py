@@ -23,7 +23,10 @@ def _():
     import json
     import requests
 
-    return gpd, mo, ol, pd
+    import shapely
+    import pyarrow.parquet as pq
+
+    return gpd, mo, ol, pd, shapely
 
 
 @app.cell
@@ -36,20 +39,35 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The following is designed as a [WebAssembly (WASM) notebook](https://docs.marimo.io/guides/wasm/).
+    """)
+    return
+
+
 @app.cell
-def _(gpd, pd):
+def _(gpd, pd, shapely):
     # _base = pathlib.Path(mo.notebook_location()).parents[0]
     # sr_df = pd.read_parquet(_base / 'data' / 'sr_data.parquet')
     # zip_gdf = gpd.read_parquet(_base / 'data' / 'zip_geo.parquet')
     # sr_df = pd.read_parquet('data/sr_data.parquet')
-    zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
+    # zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
+    # sr_df = pq.read_table('data/sr_data.parquet').to_pandas()
 
     parquet_file = r'https://raw.githubusercontent.com/tara-sullivan/service-request-map/main/data/sr_data.parquet'
     sr_df = pd.read_parquet(parquet_file, engine='auto')
+    # pq.read_table(parquet_file).to_pandas()
 
-    # parquet_file = r'https://raw.githubusercontent.com/tara-sullivan/service-request-map/main/data/zip_geo.parquet'
-    # reponse = requests.get(parquet_file)
-    # # zip_gdf = gpd.read_parquet(io.BytesIO(resp.content))
+    parquet_file = r'https://raw.githubusercontent.com/tara-sullivan/service-request-map/main/data/zip_geo.parquet'
+    zip_df = pd.read_parquet(parquet_file)
+    zip_df['geometry'] = shapely.wkb.loads(pd.read_parquet(parquet_file)['geometry'])
+    zip_gdf = gpd.GeoDataFrame(
+        data=zip_df,
+        geometry='geometry',
+        crs='EPSG:4326'
+    )
     return sr_df, zip_gdf
 
 
@@ -157,6 +175,11 @@ def _(ol, zip_count_gdf):
     map.add_tooltip()
 
     map
+    return
+
+
+@app.cell
+def _():
     return
 
 

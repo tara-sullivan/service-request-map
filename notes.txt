@@ -52,3 +52,24 @@ You have one remaining error before the WASM export will work:
 2. **GeoJSON** — works for both, no extra dependencies needed in Pyodide
 
 First thing tomorrow, change `fetch_data.py` to write GeoJSON/CSV instead of parquet, then update the notebook to read those formats. That should unblock the WASM export.
+
+-------------------
+I'm using OpenLayers for Python (`py-openlayers`) to plot maps in dynamic marimo notebooks. This code works to plot a base map:
+```python
+import marimo as mo
+import openlayers as ol
+
+map = ol.MapWidget(ol.View(center=(-73.94, 40.70), zoom=10))
+map
+```
+Now I want to add a layer with zip codes. I have a geodataframe saved as `zip_gdf`. I can read in this data in marimo:
+```python
+import geopandas as gpd
+zip_gdf = gpd.read_parquet('data/zip_geo.parquet')
+# optional: list zip code and geometry as json
+zip_gdf[['BASENAME', 'geometry']].to_json()
+```
+How do I add the polygons with the zip codes to my map?
+
+
+------
